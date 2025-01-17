@@ -8,21 +8,21 @@ fetch('/data')
         // Define arrowhead marker
         svg.append("defs").append("marker")
             .attr("id", "end")
-            .attr("viewBox", "0 -5 15 10")
-            .attr("refX", 15)
+            .attr("viewBox", "0 -5 10 10")  
+            .attr("refX", 19)  
             .attr("refY", 0)
-            .attr("markerWidth", 12)
-            .attr("markerHeight", 12)
+            .attr("markerWidth", 5) 
+            .attr("markerHeight", 5) 
             .attr("orient", "auto")
             .append("path")
-            .attr("d", "M0,-5L15,0L0,5")
-            .style("fill", "black")
-            .style("stroke", "black")
+            .attr("d", "M0,-5L10,0L0,5")
+            .style("fill", "#32CD32")  
+            .style("stroke", "#32CD32")  
             .style("stroke-width", "1px");
 
         const simulation = d3.forceSimulation(data.nodes)
-            .force("link", d3.forceLink(data.links).id(d => d.id))
-            .force("charge", d3.forceManyBody().strength(-300))
+            .force("link", d3.forceLink(data.links).id(d => d.id).distance(100))
+            .force("charge", d3.forceManyBody().strength(-200))
             .force("center", d3.forceCenter(width / 2, height / 2));
 
         // Links (edges) between nodes
@@ -30,15 +30,19 @@ fetch('/data')
             .selectAll("line")
             .data(data.links)
             .enter().append("line")
-            .attr("marker-end", "url(#end)");
+            .attr("marker-end", "url(#end)")
+            .style("stroke", "#888")
+            .style("stroke-width", 2);
 
         // Nodes (circles)
         const node = svg.append("g").attr("class", "nodes")
             .selectAll("circle")
             .data(data.nodes)
             .enter().append("circle")
-            .attr("r", 8)
+            .attr("r", 10)
             .style("fill", "#1f77b4")
+            .style("stroke", "#fff")
+            .style("stroke-width", 2)
             .call(d3.drag()
                 .on("start", dragstarted)
                 .on("drag", dragged)
@@ -50,7 +54,10 @@ fetch('/data')
             .selectAll("text")
             .data(data.nodes)
             .enter().append("text")
-            .attr("dy", -10)
+            .attr("dy", -15)
+            .style("font-family", "Arial, sans-serif")
+            .style("font-size", "12px")
+            .style("font-weight", "bold")
             .text(d => d.id);
 
         // Handle node click to highlight connected elements
@@ -68,10 +75,10 @@ fetch('/data')
             });
 
             // Highlight links
-            link.style("stroke", d => connectedLinks.has(d) ? "red" : "#999");
+            link.style("stroke", d => connectedLinks.has(d) ? "#32CD32" : "#888");
 
             // Highlight nodes
-            node.style("fill", d => connectedNodes.has(d) || d === clickedNode ? "orange" : "#1f77b4");
+            node.style("fill", d => connectedNodes.has(d) || d === clickedNode ? "#32CD32" : "#1f77b4");
         }
 
         // Simulation tick update
